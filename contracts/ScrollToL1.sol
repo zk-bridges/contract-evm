@@ -10,13 +10,15 @@ contract ScrollToL1{
         uint64  chainId;
         address user;
     }
-
+    address bridgeAddr;
+    IL2ETHGateway IL2ETHGateway_contract;
     // deposit event
     event Deposit(uint64 targetChainId, address indexed _from, address indexed _to, uint256 _value);
 
     constructor(address _bridgeAddr) {
         //L2 to L1 bridge address
-        address bridgeAddr = _bridgeAddr;
+        bridgeAddr = 0x3808d0F2F25839E73e0Fbf711368fC4aE80c7763;
+        IL2ETHGateway_contract = IL2ETHGateway(bridgeAddr);
     }
 
     function deposit(uint64 _targetChainId, address _to) external payable {
@@ -28,20 +30,12 @@ contract ScrollToL1{
             chainId: _targetChainId,
             user: _to
         });
-        // log for hardhat
-        console.log(
-            "Transferring %s eth from %s to %s on chain id %s.",
-            msg.value,
-            msg.sender,
-            _to,
-            _targetChainId
-        );
         // Notify off-chain applications of the deposit.
         emit Deposit(_targetChainId, msg.sender, _to, msg.value);
         // create call data
         bytes memory callPayload = abi.encodeWithSignature("onScrollGatewayCallback(bytes)", newBridgeInfo);
         // send to bridge
-        IL2ETHGateway.withdrawETHAndCall(_to, msg.sender, newBridgeInfo, 1000000);
+        IL2ETHGateway_contract.withdrawETHAndCall(_to, msg.sender, newBridgeInfo, 1000000);
     }
 
 }
