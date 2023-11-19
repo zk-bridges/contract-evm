@@ -32,10 +32,7 @@ contract ScrollToL1{
         });
         // Notify off-chain applications of the deposit.
         emit Deposit(_targetChainId, msg.sender, _to, msg.value);
-        // create call data
-        bytes memory callPayload = abi.encodeWithSignature("onScrollGatewayCallback(bytes)", newBridgeInfo);
         // send to bridge
-        IL2ETHGateway_contract.withdrawETHAndCall(_to, msg.sender, newBridgeInfo, 1000000);
+        IL2ETHGateway_contract.withdrawETHAndCall(_to, msg.value, abi.encode(newBridgeInfo), 1000000);
     }
-
 }
