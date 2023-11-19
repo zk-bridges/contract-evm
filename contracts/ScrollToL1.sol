@@ -2,10 +2,9 @@
 pragma solidity ^0.8.19;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./IL2ETHGateway.sol";
 
-contract Aggregator is AccessControl{
+contract ScrollToL1{
     // struct of basic infos from the origin of the L2 tx
     struct BridgeInfo {
         uint64  chainId;
