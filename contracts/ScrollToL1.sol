@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.17;
 
 import "hardhat/console.sol";
 import "./IL2ETHGateway.sol";
@@ -15,7 +15,7 @@ contract ScrollToL1{
     // deposit event
     event Deposit(uint64 targetChainId, address indexed _from, address indexed _to, uint256 _value);
 
-    constructor(address _bridgeAddr) {
+    constructor() {
         //L2 to L1 bridge address
         bridgeAddr = 0x3808d0F2F25839E73e0Fbf711368fC4aE80c7763;
         IL2ETHGateway_contract = IL2ETHGateway(bridgeAddr);
