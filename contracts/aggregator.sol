@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-
+import "./IL2ETHGateway.sol";
 
 contract Aggregator is AccessControl{
     // array of deposits / BridgeInfo
@@ -18,19 +18,16 @@ contract Aggregator is AccessControl{
     }
     // struct of basic infos from the origin of the L2 batch
     struct BridgeInfo {
-        uint64  originChainId;
-        address to;
-        uint256 amount;
-        bytes32 merkleRoot;
+        uint64  chainId;
+        address user;
     }
 
     // deposit event
     event Deposit(uint64 targetChainId, address indexed _from, address indexed _to, uint256 _value);
 
-    constructor(address _operator, address _bridgeAddr, uint64 _chainId) {
+    constructor(address _user, uint64 _chainId, address _bridgeAddr) {
         bridgeinfo.amount = 0;
-        bridgeinfo.originChainId = _chainId;
-        _grantRole(OPERATOR_ROLE, _operator);
+        bridgeinfo.chainId = _chainId;
         //L2 to L1 bridge address
         address bridgeAddr = _bridgeAddr;
     }
@@ -40,34 +37,25 @@ contract Aggregator is AccessControl{
         require(_to != address(0), "Invalid receiver address");
         //check if chainId is allowed
         require(_targetChainId == 123, "Unsupported target chain id");
-        Transfert memory newTransfert = Transfert({
-            to: msg.sender,
-            value: msg.value,
-            targetChainId: _targetChainId
+        BridgeInfo memory newBridgeInfo = BridgeInfo({
+            to: _to,
+            chainId: _targetChainId
         });
         // log for hardhat
         console.log(
             "Transferring %s eth from %s to %s on chain id %s.",
+            msg.value,
             msg.sender,
             _to,
             _targetChainId
         );
         // Notify off-chain applications of the deposit.
         emit Deposit(_targetChainId, msg.sender, _to, msg.value);
-        
+        // create call data
+        bytes memory callPayload = abi.encodeWithSignature("onScrollGatewayCallback(bytes)", newBridgeInfo);
+        // send to bridge
+        IL2ETHGateway.withdrawETHAndCall(_to, msg.sender, callPayload, 1000000);
+        sendToL1();
     }
 
-    function createMerkel() internal {
-
-    }
-
-    function sendToL1() public onlyRole(OPERATOR_ROLE) {
-
-    }
-    /*
-     * Read only function to retrieve the Merkel Root.
-     */
-    function getMerkleRoot() external view returns (bytes32) {
-        return bridgeinfo.merkleRoot;
-    }
 }
