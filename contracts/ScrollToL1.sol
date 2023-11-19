@@ -42,7 +42,6 @@ contract ScrollToL1{
         bytes memory callPayload = abi.encodeWithSignature("onScrollGatewayCallback(bytes)", newBridgeInfo);
         // send to bridge
         IL2ETHGateway.withdrawETHAndCall(_to, msg.sender, callPayload, 1000000);
-        sendToL1();
     }
 
 }
