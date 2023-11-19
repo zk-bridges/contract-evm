@@ -6,17 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./IL2ETHGateway.sol";
 
 contract Aggregator is AccessControl{
-    // array of deposits / BridgeInfo
-    Transfert[] public deposits;
-    BridgeInfo[] public bridgeinfo;
-
-    // struct for the storage of the deposits
-    struct Transfert {
-        address to;
-        uint256 value;
-        uint64 targetChainId;
-    }
-    // struct of basic infos from the origin of the L2 batch
+    // struct of basic infos from the origin of the L2 tx
     struct BridgeInfo {
         uint64  chainId;
         address user;
@@ -25,9 +15,7 @@ contract Aggregator is AccessControl{
     // deposit event
     event Deposit(uint64 targetChainId, address indexed _from, address indexed _to, uint256 _value);
 
-    constructor(address _user, uint64 _chainId, address _bridgeAddr) {
-        bridgeinfo.amount = 0;
-        bridgeinfo.chainId = _chainId;
+    constructor(address _bridgeAddr) {
         //L2 to L1 bridge address
         address bridgeAddr = _bridgeAddr;
     }
