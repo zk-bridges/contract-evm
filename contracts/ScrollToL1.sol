@@ -25,8 +25,8 @@ contract ScrollToL1{
         //check if chainId is allowed
         require(_targetChainId == 123, "Unsupported target chain id");
         BridgeInfo memory newBridgeInfo = BridgeInfo({
-            to: _to,
-            chainId: _targetChainId
+            chainId: _targetChainId,
+            user: _to
         });
         // log for hardhat
         console.log(
@@ -41,7 +41,7 @@ contract ScrollToL1{
         // create call data
         bytes memory callPayload = abi.encodeWithSignature("onScrollGatewayCallback(bytes)", newBridgeInfo);
         // send to bridge
-        IL2ETHGateway.withdrawETHAndCall(_to, msg.sender, callPayload, 1000000);
+        IL2ETHGateway.withdrawETHAndCall(_to, msg.sender, newBridgeInfo, 1000000);
     }
 
 }
